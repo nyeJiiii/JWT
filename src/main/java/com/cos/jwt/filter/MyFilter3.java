@@ -11,7 +11,7 @@ public class MyFilter3 implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         System.out.println("필터3");
-        chain.doFilter(request, response);
+//        chain.doFilter(request, response);
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
@@ -23,13 +23,27 @@ public class MyFilter3 implements Filter {
             System.out.println("POST 요청됨");
             String headerAuth = req.getHeader("Authorization");
             System.out.println("headerAuth = " + headerAuth);
-            if(headerAuth.equals("cos")) {
-                chain.doFilter(req, res);
-            } else {
-                PrintWriter out = res.getWriter();
-                out.println("인증안됨 ");
-            }
-        }
-    }
 
+            // Authorization 헤더가 없거나 "cos"가 아닌 경우 처리
+            if (headerAuth == null || !headerAuth.equals("cos")) {
+                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                PrintWriter out = res.getWriter();
+                out.println("인증안됨");
+            } else {
+                chain.doFilter(req, res);
+            }
+        } else {
+            chain.doFilter(req, res);
+        }
+
+//            if(headerAuth.equals("cos")) {
+//                chain.doFilter(req, res);
+//            } else {
+//                PrintWriter out = res.getWriter();
+//                out.println("인증안됨 ");
+//            }
+
+    }
 }
+
+
